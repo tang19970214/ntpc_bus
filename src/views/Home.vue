@@ -1,6 +1,10 @@
 <template>
   <div class="homePage">
-    <BusListForm :busList="busList" @getBusInfo="getBusInfo" @initMap="initMap()" />
+    <BusListForm
+      :busList="busList"
+      @getBusInfo="getBusInfo"
+      @initMap="initMap()"
+    />
     <div id="map" ref="map"></div>
   </div>
 </template>
