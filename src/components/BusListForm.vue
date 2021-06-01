@@ -74,20 +74,20 @@ export default {
   data() {
     return {
       showTollBar: true,
-      busOrder: [], //替換成busList: , busMarkList: length>0，才換
+      busOrderList: [], //替換成busList: , busMarkList: length>0，才換
     }
   },
   methods: {
     getBusInfo(row) {
-      console.log("getBusInfo",row);
+      // console.log("getBusInfo",row);
       this.$emit("getBusInfo", row)
     },
     initMap() {
       this.$emit("initMap")
     },
     selectionChange(val) {
-      this.busOrder=val
-      this.$emit("busOrderFun",this.busOrder)
+      this.busOrderList=val
+      this.$emit("getBusOrder",this.busOrderList)
     },
   },
 }
