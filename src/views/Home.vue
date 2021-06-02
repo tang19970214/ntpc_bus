@@ -90,11 +90,46 @@ export default {
             : require("@/assets/images/carIcon@1x.png"),
           map: this.map,
         })
+        console.log("allList", allList)
         let getBusInfos = allList.map((res) => res.BusID)
         let busInfo = this.busList.filter((resp) =>
-          getBusInfos.includes(Number(resp.carId))
+          getBusInfos?.includes(Number(resp.carId))
         )
+        console.log("busInfo", busInfo)
 
+        const infowindow = new google.maps.InfoWindow({
+          // 設定想要顯示的內容
+          content:
+            `
+          <div class="markerPopover">
+            <p>駕駛員：` +
+            busInfo.driverName +
+            `</p>
+            <p>聯絡電話：` +
+            busInfo.driverPhone +
+            `</p>
+            <p>任務說明：` +
+            busInfo.dutyDesc +
+            `</p>
+            <p>車速：` +
+            location.Speed +
+            `</p>
+            <p>車輛：` +
+            busInfo.carNo +
+            `</p>
+          </div>
+        `,
+          // 設定訊息視窗最大寬度
+          maxWidth: 200,
+        })
+
+        // 在地標上監聽點擊事件
+        marker.addListener("click", () => {
+          // 指定在哪個地圖和地標上開啟訊息視窗
+          infowindow.open(this.map, marker)
+        })
+
+        return
         console.log("busInfo", busInfo)
         this.getDialogInfo(busInfo)
         this.openDialogInfo(marker)
