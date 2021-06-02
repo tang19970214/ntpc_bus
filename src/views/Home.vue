@@ -97,19 +97,19 @@ export default {
             `
           <div class="markerPopover">
             <p>駕駛員：` +
-            getInfos[idx].driverName +
+            getInfos[idx]?.driverName +
             `</p>
             <p>聯絡電話：` +
-            getInfos[idx].driverPhone +
+            getInfos[idx]?.driverPhone +
             `</p>
             <p>任務說明：` +
-            getInfos[idx].dutyDesc +
+            getInfos[idx]?.dutyDesc +
             `</p>
             <p>車速：` +
             location.Speed +
             `</p>
             <p>車輛：` +
-            getInfos[idx].carNo +
+            getInfos[idx]?.carNo +
             `</p>
           </div>
         `,
@@ -123,46 +123,6 @@ export default {
           // 指定在哪個地圖和地標上開啟訊息視窗
           infowindow.open(this.map, marker);
         });
-      });
-
-      return;
-      console.log("busInfo", busInfo);
-      this.getDialogInfo(busInfo);
-      this.openDialogInfo(marker);
-      // });
-    },
-    getDialogInfo(busInfo) {
-      const infowindow = new google.maps.InfoWindow({
-        // 設定想要顯示的內容
-        content:
-          `
-          <div class="markerPopover">
-            <p>駕駛員：` +
-          busInfo.driverName +
-          `</p>
-            <p>聯絡電話：` +
-          busInfo.driverPhone +
-          `</p>
-            <p>任務說明：` +
-          busInfo.dutyDesc +
-          `</p>
-            <p>車速：` +
-          location.Speed +
-          `</p>
-            <p>車輛：` +
-          busInfo.carNo +
-          `</p>
-          </div>
-        `,
-        // 設定訊息視窗最大寬度
-        maxWidth: 200,
-      });
-    },
-    openDialogInfo(marker) {
-      // 在地標上監聽點擊事件
-      marker.addListener("click", () => {
-        // 指定在哪個地圖和地標上開啟訊息視窗
-        infowindow.open(this.map, marker);
       });
     },
     async getCarInfo() {
