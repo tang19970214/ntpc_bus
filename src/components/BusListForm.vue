@@ -79,7 +79,7 @@ export default {
   },
   methods: {
     getBusInfo(row) {
-      // console.log("getBusInfo",row);
+      console.log("getBusInfo",row);
       this.$emit("getBusInfo", row)
     },
     initMap() {
