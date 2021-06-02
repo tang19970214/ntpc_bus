@@ -19,6 +19,7 @@ export default {
   data() {
     return {
       busList: [],
+      cardList: [],
       busMarkList: [],
       map: document.getElementById("map"),
     }
@@ -64,10 +65,23 @@ export default {
       let marker = this.setMaker()
     },
     setMaker() {
+      // busMarkList & cardList 合併跑回圈
+
       this.busMarkList.forEach((location) => {
-        const busInfo = this.busList.filter(
-          (res) => res.BusID == location.carId
-        )[0]
+        //   const busInfo = this.busList.filter((res) => {
+        //     // console.log("location", location)
+        //     res.carId == location.BusID
+        //   })[0]
+        const busInfo = []
+        // for (const busMarkItem of this.busMarkList) {
+        //   let busInfo = this.busList.map((res) => {
+        //     // console.log("busMarkItem", busMarkItem[i])
+        //     // console.log("res", res)
+        //     return res.carId === busMarkItem.BusID
+        //   })
+        //   console.log("busInfo", busInfo)
+        // }
+
         const marker = new google.maps.Marker({
           //原始中心點
           position: {
@@ -78,9 +92,9 @@ export default {
           map: this.map,
         })
         // 透過 InfoWindow 物件建構子建立新訊息視窗
-        this.getDialogInfo(busInfo)
-        this.openDialogInfo(marker)
       })
+      this.getDialogInfo(busInfo)
+      this.openDialogInfo(marker)
     },
     getDialogInfo(busInfo) {
       const infowindow = new google.maps.InfoWindow({
@@ -88,7 +102,7 @@ export default {
         content:
           `
           <div class="markerPopover">
-            <p>駕員：` +
+            <p>駕駛員：` +
           busInfo.driverName +
           `</p>
             <p>聯絡電話：` +
@@ -120,6 +134,14 @@ export default {
   mounted() {
     this.busList = this.$store.state.busList
     this.busMarkList = this.$store.state.busMarkList
+    this.axios
+      .get("http://care.1966.org.tw/api/api/DriverInfo/DeviceGpsViewModel")
+      .then((res) => {
+        this.cardList = res.data.response
+      })
+      .catch((error) => {
+        console.log(error)
+      })
     this.initMap()
     this.setMaker()
   },
