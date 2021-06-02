@@ -56,10 +56,9 @@
       <el-button type="warning" plain @click="initMap()"
         >重新載入 google map</el-button
       > -->
-      <!-- <el-button type="primary" plain @click="showTollBar = !showTollBar">{{
+    <!-- <el-button type="primary" plain @click="showTollBar = !showTollBar">{{
         showTollBar ? "隱藏" : "顯示"
       }}</el-button> -->
-    </div>
   </div>
 </template>
 
@@ -74,20 +73,19 @@ export default {
   data() {
     return {
       showTollBar: true,
-      busOrderList: [], //替換成busList: , busMarkList: length>0，才換
+      busOrderList: [],
     }
   },
   methods: {
     getBusInfo(row) {
-      console.log("getBusInfo",row);
       this.$emit("getBusInfo", row)
     },
     initMap() {
       this.$emit("initMap")
     },
     selectionChange(val) {
-      this.busOrderList=val
-      this.$emit("getBusOrder",this.busOrderList)
+      this.busOrderList = val
+      this.$emit("getBusOrder", this.busOrderList)
     },
   },
 }
@@ -103,7 +101,7 @@ export default {
   z-index: 10;
   background: white;
   border-radius: 8px;
-  .el-tabs__content{
+  .el-tabs__content {
     padding: 0;
   }
   &__table {
