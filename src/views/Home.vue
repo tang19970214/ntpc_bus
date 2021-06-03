@@ -1,12 +1,17 @@
 <template>
   <div class="homePage">
-    <BusListForm :busList="busList" @getBusInfo="getBusInfo" @initMap="initMap()" @getBusOrder="getBusOrder" />
+    <BusListForm
+      :busList="busList"
+      @getBusInfo="getBusInfo"
+      @initMap="initMap()"
+      @getBusOrder="getBusOrder"
+    />
     <div id="map" ref="map"></div>
   </div>
 </template>
 
 <script>
-import BusListForm from "../components/BusListForm.vue";
+import BusListForm from "../components/BusListForm.vue"
 
 export default {
   name: "Home",
@@ -17,27 +22,27 @@ export default {
       cardList: [],
       busMarkList: [],
       map: document.getElementById("map"),
-    };
+    }
   },
   methods: {
     //勾選巴士後更新 busMarkList
     getBusOrder(order) {
       if (order.length > 0) {
         // 取得所選車輛id
-        let getBusIds = order.map((res) => res.carId);
+        let getBusIds = order.map((res) => res.carId)
         let getBusLocal = this.busMarkList.filter((resp) =>
           getBusIds.includes(Number(resp.BusID))
-        );
-        this.initMap(getBusLocal);
+        )
+        this.initMap(getBusLocal)
       } else {
-        this.initMap(this.busMarkList);
+        this.initMap(this.busMarkList)
       }
     },
 
     //定位巴士，顯示 dialog
     getBusInfo(row) {
-      let getMark = this.busMarkList.filter((res) => res.BusID == row.carId)[0];
-      this.map.panTo({ lat: Number(getMark.Lat), lng: Number(getMark.Lon) });
+      let getMark = this.busMarkList.filter((res) => res.BusID == row.carId)[0]
+      this.map.panTo({ lat: Number(getMark.Lat), lng: Number(getMark.Lon) })
     },
     initMap(getBusLocal) {
       this.map = new google.maps.Map(document.getElementById("map"), {
@@ -61,24 +66,24 @@ export default {
         // terrain 顯示基於地形信息的物理地圖。
         mapTypeId: "roadmap",
         // 需要再前往修改，https://mapstyle.withgoogle.com/
-      });
-      let marker = this.setMaker(getBusLocal);
+      })
+      this.setMaker(getBusLocal)
     },
     setMaker(getBusLocal) {
       // 將巴士及小車合併成一個array
-      let allList = [];
+      let allList = []
       if (!!getBusLocal) {
-        allList = getBusLocal.concat(this.cardList);
+        allList = getBusLocal.concat(this.cardList)
       } else {
-        allList = this.busMarkList.concat(this.cardList);
+        allList = this.busMarkList.concat(this.cardList)
       }
 
       // 整理出所有車牌
-      let getBusInfos = allList.map((res) => res.BusID);
+      let getBusInfos = allList.map((res) => res.BusID)
       allList.forEach((location, idx) => {
         let getInfos = this.busList.filter(
           (res) => getBusInfos.includes(res.carId) || {}
-        );
+        )
         const marker = new google.maps.Marker({
           //原始中心點
           position: {
@@ -89,7 +94,7 @@ export default {
             ? require("@/assets/images/busIcon@1x.png")
             : require("@/assets/images/carIcon@1x.png"),
           map: this.map,
-        });
+        })
 
         const infowindow = new google.maps.InfoWindow({
           // 設定想要顯示的內容
@@ -116,34 +121,34 @@ export default {
           // 設定訊息視窗最大寬度
           maxWidth: 200,
           // zIndex: 1
-        });
+        })
 
         // 在地標上監聽點擊事件
         marker.addListener("click", () => {
           // 指定在哪個地圖和地標上開啟訊息視窗
-          infowindow.open(this.map, marker);
-        });
-      });
+          infowindow.open(this.map, marker)
+        })
+      })
     },
     async getCarInfo() {
       await this.axios
         .get("http://care.1966.org.tw/api/api/DriverInfo/DeviceGpsViewModel")
         .then((res) => {
-          this.cardList = res.data.response;
+          this.cardList = res.data.response
         })
         .catch((error) => {
-          console.log(error);
-        });
+          console.log(error)
+        })
     },
   },
   async mounted() {
-    this.busList = this.$store.state.busList;
-    this.busMarkList = this.$store.state.busMarkList;
-    await this.getCarInfo();
-    this.initMap();
+    this.busList = this.$store.state.busList
+    this.busMarkList = this.$store.state.busMarkList
+    await this.getCarInfo()
+    this.initMap()
     // this.setMaker();
   },
-};
+}
 </script>
 
 <style lang="scss">
