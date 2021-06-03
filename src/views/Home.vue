@@ -3,8 +3,8 @@
     <BusListForm
       :busList="busList"
       @getBusInfo="getBusInfo"
-      @initMap="initMap()"
       @getBusOrder="getBusOrder"
+      @initMap="initMap()"
     />
     <div id="map" ref="map"></div>
   </div>
@@ -43,6 +43,11 @@ export default {
     getBusInfo(row) {
       let getMark = this.busMarkList.filter((res) => res.BusID == row.carId)[0]
       this.map.panTo({ lat: Number(getMark.Lat), lng: Number(getMark.Lon) })
+      // let [location, idx, getInfos] = [getMark, "", row]
+      let location = getMark
+      let idx = ""
+      let getInfos = row
+      this.showDialog(location, idx, getInfos)
     },
     initMap(getBusLocal) {
       this.map = new google.maps.Map(document.getElementById("map"), {
@@ -77,57 +82,58 @@ export default {
       } else {
         allList = this.busMarkList.concat(this.cardList)
       }
-
       // 整理出所有車牌
       let getBusInfos = allList.map((res) => res.BusID)
       allList.forEach((location, idx) => {
         let getInfos = this.busList.filter(
           (res) => getBusInfos.includes(res.carId) || {}
         )
-        const marker = new google.maps.Marker({
-          //原始中心點
-          position: {
-            lat: Number(location.Lat),
-            lng: Number(location.Lon),
-          },
-          icon: location.BusID
-            ? require("@/assets/images/busIcon@1x.png")
-            : require("@/assets/images/carIcon@1x.png"),
-          map: this.map,
-        })
+        // 顯示所有 icon 跟 dialog
+        this.showDialog(location, idx, getInfos)
+      })
+    },
+    showDialog(location, idx, getInfos) {
+      const marker = new google.maps.Marker({
+        //原始中心點
+        position: {
+          lat: Number(location.Lat),
+          lng: Number(location.Lon),
+        },
+        icon: location.BusID
+          ? require("@/assets/images/busIcon@1x.png")
+          : require("@/assets/images/carIcon@1x.png"),
+        map: this.map,
+      })
 
-        const infowindow = new google.maps.InfoWindow({
-          // 設定想要顯示的內容
-          content:
-            `
+      const infowindow = new google.maps.InfoWindow({
+        // 設定想要顯示的內容
+        content:
+          `
           <div class="markerPopover">
             <p>駕駛員：` +
-            getInfos[idx]?.driverName +
-            `</p>
+          getInfos[idx]?.driverName +
+          `</p>
             <p>聯絡電話：` +
-            getInfos[idx]?.driverPhone +
-            `</p>
+          getInfos[idx]?.driverPhone +
+          `</p>
             <p>任務說明：` +
-            getInfos[idx]?.dutyDesc +
-            `</p>
+          getInfos[idx]?.dutyDesc +
+          `</p>
             <p>車速：` +
-            location.Speed +
-            `</p>
+          location.Speed +
+          `</p>
             <p>車輛：` +
-            getInfos[idx]?.carNo +
-            `</p>
+          getInfos[idx]?.carNo +
+          `</p>
           </div>
         `,
-          // 設定訊息視窗最大寬度
-          maxWidth: 200,
-          // zIndex: 1
-        })
-
-        // 在地標上監聽點擊事件
-        marker.addListener("click", () => {
-          // 指定在哪個地圖和地標上開啟訊息視窗
-          infowindow.open(this.map, marker)
-        })
+        // 設定訊息視窗最大寬度
+        maxWidth: 200,
+        // zIndex: 1
+      })
+      marker.addListener("click", () => {
+        // 指定在哪個地圖和地標上開啟訊息視窗
+        infowindow.open(this.map, marker)
       })
     },
     async getCarInfo() {
