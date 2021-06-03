@@ -3,7 +3,6 @@
     <el-tabs type="border-card" class="busListFormPage__tollBar">
       <el-tab-pane label="任務管理">
         <el-button type="warning" plain @click="initMap()">重新載入 google map</el-button>
-        <router-link :to="{name: 'About'}">測試頁</router-link>
         <div class="busListFormPage__table">
           <el-table :data="busList" height="300" stripe style="width: 100%" @row-click="getBusInfo" @selection-change="selectionChange" :show-overflow-tooltip="true" :stripe="false">
             <el-table-column type="selection" width="55"></el-table-column>
