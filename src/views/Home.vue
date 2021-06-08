@@ -7,6 +7,7 @@
       @getBusOrder="getBusOrder"
     />
     <div id="map" ref="map"></div>
+    <div id="msg"></div>
   </div>
 </template>
 
@@ -24,9 +25,56 @@ export default {
       map: document.getElementById("map"),
       // 存放目前開啟的訊息視窗
       infowindow: null,
+      latMarker: 23.47316642202988,
+      lonMarker: 120.29256820678711,
+      getBusLat: null,
+      getBusLon: null,
     }
   },
   methods: {
+    getDistanceTime() {
+      let map
+      // Point1 自己點位，目前是寫死狀態
+      let Point1 = { lat: Number(this.latMarker), lng: Number(this.lonMarker) }
+      // Point2 點選的
+      let Point2 = { lat: Number(this.getBusLat), lng: Number(this.getBusLon) }
+      let directionsService = new google.maps.DirectionsService()
+      let directionsRenderer = new google.maps.DirectionsRenderer()
+
+      directionsRenderer.setMap(map)
+
+      const route = {
+        origin: Point1,
+        destination: Point2,
+        travelMode: "DRIVING",
+      }
+
+      directionsService.route(route, (response, status) => {
+        // console.log("route", route)
+        // console.log("response", response)
+        // console.log("status", status)
+        if (status !== "OK") {
+          window.alert("Directions request failed due to " + status)
+          return
+        } else {
+          directionsRenderer.setDirections(response) // Add route to the map
+          let directionsData = response.routes[0].legs[0] // Get data about the mapped route
+          // console.log("directionsData", directionsData)
+          if (!directionsData) {
+            window.alert("Directions request failed")
+            return
+          } else {
+            // document.getElementById("msg").innerHTML +=
+            document.getElementsByClassName("markerPopover").innerHTML +=
+              "距離 ： " +
+              directionsData.distance.text +
+              " (" +
+              directionsData.duration.text +
+              ")."
+          }
+        }
+      })
+    },
     //勾選巴士後更新 busMarkList
     getBusOrder(order) {
       if (order.length > 0) {
@@ -45,9 +93,13 @@ export default {
     getBusInfo(row) {
       let getMark = this.busMarkList.filter((res) => res.BusID == row.carId)[0]
       this.map.panTo({
-        lat: Number(getMark.Lat) + 1,
+        lat: Number(getMark.Lat),
         lng: Number(getMark.Lon),
       })
+      this.getBusLat = getMark.Lat
+      this.getBusLon = getMark.Lon
+      // console.log("Lat", getMark.Lat)
+      // console.log("Lon", getMark.Lon)
       const marker = new google.maps.Marker({
         //原始中心點
         position: {
@@ -59,6 +111,7 @@ export default {
           : require("@/assets/images/carIcon@1x.png"),
         map: this.map,
       })
+      this.getDistanceTime()
       // 透過 InfoWindow 物件建構子建立新訊息視窗
       const infowindow = new google.maps.InfoWindow({
         // 設定想要顯示的內容
@@ -80,6 +133,11 @@ export default {
             <p>車輛：` +
           row.carNo +
           `</p>
+           <p>距離：` +
+          directionsData.distance.text +
+          " (" +
+          directionsData.duration.text +
+          ")."`</p>
           </div>
         `,
         // 設定訊息視窗最大寬度
@@ -107,6 +165,7 @@ export default {
         minZoom: 3,
         streetViewControl: false,
         mapTypeControl: false,
+        draggable: true,
       })
 
       this.setMarker(getBusLocal)
@@ -137,6 +196,7 @@ export default {
             : require("@/assets/images/carIcon@1x.png"),
           map: this.map,
         })
+        // console.log("marker", marker)
         // 透過 InfoWindow 物件建構子建立新訊息視窗
         const infowindow = new google.maps.InfoWindow({
           // 設定想要顯示的內容
@@ -156,6 +216,9 @@ export default {
             location.Speed +
             `</p>
             <p>車輛：` +
+            getInfos[idx]?.carNo +
+            `</p>
+             <p>所需時間：` +
             getInfos[idx]?.carNo +
             `</p>
           </div>
@@ -193,7 +256,6 @@ export default {
     this.busMarkList = this.$store.state.busMarkList
     await this.getCarInfo()
     this.initMap()
-    // this.setMaker();
   },
 }
 </script>
