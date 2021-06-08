@@ -27,32 +27,28 @@ export default {
       infowindow: null,
       latMarker: 23.47316642202988,
       lonMarker: 120.29256820678711,
-      getBusLat: null,
-      getBusLon: null,
+      Point1: null,
+      Point2: null,
+      duration: null,
     }
   },
   methods: {
     getDistanceTime() {
       let map
-      // Point1 自己點位，目前是寫死狀態
-      let Point1 = { lat: Number(this.latMarker), lng: Number(this.lonMarker) }
-      // Point2 點選的
-      let Point2 = { lat: Number(this.getBusLat), lng: Number(this.getBusLon) }
       let directionsService = new google.maps.DirectionsService()
       let directionsRenderer = new google.maps.DirectionsRenderer()
 
       directionsRenderer.setMap(map)
 
       const route = {
-        origin: Point1,
-        destination: Point2,
+        origin: this.Point1,
+        destination: this.Point2,
         travelMode: "DRIVING",
       }
-
       directionsService.route(route, (response, status) => {
-        // console.log("route", route)
-        // console.log("response", response)
-        // console.log("status", status)
+        this.duration = response.routes[0].legs[0].duration.text
+        // console.log("this.duration", this.duration)
+        return
         if (status !== "OK") {
           window.alert("Directions request failed due to " + status)
           return
@@ -64,8 +60,8 @@ export default {
             window.alert("Directions request failed")
             return
           } else {
-            // document.getElementById("msg").innerHTML +=
-            document.getElementsByClassName("markerPopover").innerHTML +=
+            document.getElementById("msg").innerHTML +=
+              // document.getElementsByClassName("markerPopover").innerHTML +=
               "距離 ： " +
               directionsData.distance.text +
               " (" +
@@ -96,10 +92,6 @@ export default {
         lat: Number(getMark.Lat),
         lng: Number(getMark.Lon),
       })
-      this.getBusLat = getMark.Lat
-      this.getBusLon = getMark.Lon
-      // console.log("Lat", getMark.Lat)
-      // console.log("Lon", getMark.Lon)
       const marker = new google.maps.Marker({
         //原始中心點
         position: {
@@ -111,7 +103,13 @@ export default {
           : require("@/assets/images/carIcon@1x.png"),
         map: this.map,
       })
-      this.getDistanceTime()
+      // Point1 自定點位（目前是寫死狀態）
+      this.Point1 = { lat: Number(this.latMarker), lng: Number(this.lonMarker) }
+      // Point2 點選巴士的點位
+      this.Point2 = { lat: Number(getMark.Lat), lng: Number(getMark.Lon) }
+      this.getDistanceTime(this.Point1, this.Point2)
+      let totalTime = this.duration
+      // console.log("totalTime", totalTime)
       // 透過 InfoWindow 物件建構子建立新訊息視窗
       const infowindow = new google.maps.InfoWindow({
         // 設定想要顯示的內容
@@ -133,11 +131,9 @@ export default {
             <p>車輛：` +
           row.carNo +
           `</p>
-           <p>距離：` +
-          directionsData.distance.text +
-          " (" +
-          directionsData.duration.text +
-          ")."`</p>
+           <p>預估時間：` +
+          totalTime +
+          `</p>
           </div>
         `,
         // 設定訊息視窗最大寬度
@@ -218,7 +214,7 @@ export default {
             <p>車輛：` +
             getInfos[idx]?.carNo +
             `</p>
-             <p>所需時間：` +
+            <p>車輛：` +
             getInfos[idx]?.carNo +
             `</p>
           </div>

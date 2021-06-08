@@ -47,11 +47,6 @@
               prop="dutyStatus"
               width="100px"
             ></el-table-column>
-            <el-table-column
-              label="所需時間"
-              prop="time"
-              width="100px"
-            ></el-table-column>
           </el-table>
         </div>
       </el-tab-pane>
@@ -99,7 +94,7 @@ export default {
 <style lang="scss">
 .busListFormPage {
   width: 100%;
-  max-width: 920px;
+  max-width: 824px;
   position: fixed;
   top: 4px;
   left: 4px;
